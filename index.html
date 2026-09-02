@@ -1,1 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ENGL111 Midterm Grammar Review</title>
+  <style>
+    :root{
+      --garnet:#8A1538;
+      --garnet-dark:#5f0f28;
+      --garnet-soft:#e8e1da;
+      --cream:#f7f3ee;
+      --ink:#2b2226;
+      --muted:#6d5c64;
+      --correct:#127c56;
+      --wrong:#b3261e;
+      --card:#ffffff;
+      --shadow:0 10px 30px rgba(88,15,43,.16);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(160deg, #f7f3ee, #e4ddd5);
+      color:var(--ink);
+      min-height:100vh;
+    }
+    .app{max-width:860px;margin:0 auto;padding:18px;}
+    header{
+      background:linear-gradient(135deg,var(--garnet),var(--garnet-dark));
+      color:white;border-radius:var(--radius);padding:22px 18px;
+      box-shadow:var(--shadow);margin-bottom:16px;
+    }
+    h1{font-size:clamp(1.55rem,5vw,2.5rem);margin:0 0 8px;line-height:1.05;}
+    header p{margin:0;opacity:.92;font-size:.98rem;}
+    .card{
+      background:var(--card);border-radius:var(--radius);padding:16px;
+      box-shadow:var(--shadow);margin-bottom:16px;
+    }
+    .grid{display:grid;grid-template-columns: repeat(auto-fit,minmax(160px,1fr));gap:10px;}
+    button, select, input{font:inherit;}
+    button{
+      border:0;border-radius:16px;padding:12px 14px;background:var(--garnet);
+      color:white;cursor:pointer;font-weight:700;min-height:46px;transition:transform .06s ease;
+    }
+    button:active{transform:scale(.97);}
+    button.secondary{background:var(--garnet-soft);color:var(--garnet-dark);}
+    button.ghost{background:#f4f0f1;color:var(--ink);}
+    button:disabled{opacity:.55;cursor:not-allowed;}
+    select, input[type="text"]{
+      width:100%;border:2px solid #ead5dd;border-radius:16px;padding:12px 14px;
+      background:white;color:var(--ink);min-height:46px;
+    }
+    label{display:block;color:var(--muted);font-size:.88rem;font-weight:700;margin-bottom:6px;}
+    .stats{display:grid;grid-template-columns: repeat(4,1fr);gap:8px;margin:12px 0;}
+    .stat{background:#fff7f9;border:1px solid #edd1db;border-radius:16px;padding:10px 8px;text-align:center;}
+    .stat strong{display:block;color:var(--garnet-dark);font-size:1.2rem;}
+    .stat span{font-size:.78rem;color:var(--muted);}
 
+    .ring-wrap{position:relative;width:104px;height:104px;margin:8px auto 2px;}
+    .ring{transform:rotate(-90deg);display:block;}
+    .ring-track{fill:none;stroke:#ead5dd;stroke-width:10;}
+    .ring-fill{fill:none;stroke:var(--garnet);stroke-width:10;stroke-linecap:round;
+      stroke-dasharray:326.7;stroke-dashoffset:326.7;transition:stroke-dashoffset .4s ease;}
+    .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+    .ring-center strong{font-size:1.5rem;color:var(--garnet-dark);line-height:1;}
+    .ring-center span{font-size:.62rem;color:var(--muted);margin-top:2px;letter-spacing:.02em;}
+
+    .question-meta{display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--muted);font-size:.9rem;margin-bottom:10px;}
+    .badge{display:inline-block;background:var(--garnet-soft);color:var(--garnet-dark);padding:6px 10px;border-radius:99px;font-weight:800;font-size:.78rem;}
+    .question{font-size:1.25rem;font-weight:800;line-height:1.35;margin:10px 0 16px;}
+    .choices{display:grid;gap:10px;}
+    .choice{width:100%;text-align:left;background:#faf7f8;color:var(--ink);border:2px solid #ead5dd;font-weight:700;}
+    .choice:hover{border-color:var(--garnet);}
+    .feedback{margin-top:14px;padding:13px;border-radius:16px;display:none;line-height:1.45;}
+    .feedback.correct{display:block;background:#e7f5ef;color:#064b32;border:1px solid #b7e2d1;}
+    .feedback.wrong{display:block;background:#fff0ee;color:#6e160f;border:1px solid #f1b7b2;}
+    .praise{font-size:1.05rem;font-weight:800;}
+    .arabic{direction:rtl;text-align:right;font-family:"Tahoma","Arial",sans-serif;margin-top:6px;font-weight:700;}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+    .hidden{display:none!important}
+    .small{color:var(--muted);font-size:.9rem;line-height:1.4;}
+    #mistakesInfo{margin:6px 0 0;font-weight:700;color:var(--garnet-dark);}
+    .review-list{padding-left:18px;}
+    .review-list li{margin:8px 0;}
+
+    .order-wrap{display:grid;gap:14px;}
+    .section-label{font-weight:800;color:var(--muted);font-size:.82rem;margin-bottom:6px;}
+    .slot-list,.pool-list{display:grid;gap:8px;}
+    .order-slot{border:2px dashed #d9c2cb;border-radius:14px;padding:8px 12px;min-height:48px;display:flex;align-items:center;gap:10px;background:#fbf7f9;}
+    .order-slot .num{font-weight:800;color:var(--garnet);min-width:20px;text-align:center;}
+    .order-slot .filled{flex:1;text-align:left;background:#fff;border:2px solid #ead5dd;border-radius:12px;padding:8px 10px;font-weight:600;cursor:pointer;}
+    .order-slot .empty{flex:1;color:#b7a3ab;font-style:italic;font-size:.9rem;}
+    .order-slot.correct .filled{border-color:var(--correct);background:#e7f5ef;}
+    .order-slot.wrong .filled{border-color:var(--wrong);background:#fff0ee;}
+    .pool-item{background:#faf7f8;color:var(--ink);border:2px solid #ead5dd;border-radius:14px;padding:10px 12px;cursor:pointer;font-weight:600;text-align:left;width:100%;}
+    .pool-item:hover{border-color:var(--garnet);}
+
+    .match-wrap{display:grid;grid-template-columns:1fr 96px;gap:10px;align-items:start;}
+    .match-col{display:grid;gap:8px;}
+    .match-item{border:2px solid #ead5dd;border-radius:14px;padding:10px 12px;background:#faf7f8;cursor:pointer;font-weight:600;text-align:center;position:relative;}
+    .match-left{text-align:left;padding-right:34px;}
+    .match-item.sel{border-color:var(--garnet);background:#fdeef3;}
+    .match-item.done{cursor:default;}
+    .match-item .tag{display:inline-block;min-width:20px;height:20px;line-height:20px;border-radius:50%;background:var(--garnet);color:#fff;font-size:.72rem;font-weight:800;text-align:center;}
+    .match-left .tag{position:absolute;right:10px;top:50%;transform:translateY(-50%);}
+    .match-item.correct{border-color:var(--correct);background:#e7f5ef;}
+    .match-item.wrong{border-color:var(--wrong);background:#fff0ee;}
+
+    #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60;display:none;}
+
+    .wordfill-wrap{display:grid;gap:14px;}
+    .wf-item{background:#fbf7f9;border:1px solid #efdbe3;border-radius:14px;padding:10px 12px;}
+    .wf-sentence{font-weight:600;margin-bottom:8px;line-height:1.5;}
+    .wf-blank{display:inline-block;min-width:70px;border-bottom:2px solid var(--garnet);color:var(--garnet-dark);font-weight:800;text-align:center;padding:0 4px;}
+    .wf-choices{display:flex;gap:8px;flex-wrap:wrap;}
+    .wf-chip{background:#faf7f8;color:var(--ink);border:2px solid #ead5dd;border-radius:99px;padding:8px 14px;font-weight:700;cursor:pointer;min-height:0;}
+    .wf-chip:hover{border-color:var(--garnet);}
+    .wf-chip.sel{background:#fdeef3;border-color:var(--garnet);color:var(--garnet-dark);}
+    .wf-chip.correct{background:#e7f5ef;border-color:var(--correct);color:#064b32;}
+    .wf-chip.wrong{background:#fff0ee;border-color:var(--wrong);color:#6e160f;}
+    .wf-chip:disabled{cursor:default;}
+
+    @media (max-width:620px){
+      .app{padding:12px}
+      header,.card{border-radius:18px}
+      .stats{grid-template-columns: repeat(2,1fr)}
+      .question{font-size:1.12rem}
+      .controls button{flex:1 1 140px}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <div class="app">
+    <header>
+      <h1>ENGL111 Midterm Grammar Review</h1>
+      <p>Practice Units 1, 2, and 3 grammar. Choose a grammar point, answer questions, and build your streak.</p>
+    </header>
+
+    <section id="setup" class="card">
+      <div class="grid">
+        <div>
+          <label for="category">Grammar focus</label>
+          <select id="category"></select>
+        </div>
+        <div>
+          <label for="mode">Practice mode</label>
+          <select id="mode">
+            <option value="endless">Practice until I stop</option>
+            <option value="ten">10 questions - 5 minutes</option>
+            <option value="twenty">20 questions</option>
+            <option value="review">Review my mistakes</option>
+          </select>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="startBtn">Start Practice</button>
+        <button id="soundBtn" class="secondary" type="button">Sound: On</button>
+        <button id="resetBestBtn" class="ghost">Reset Best Score</button>
+        <button id="resetProgressBtn" class="ghost">Reset Progress</button>
+      </div>
+      <p class="small">Wrong answers show a short Arabic explanation. Correct answers keep moving quickly. Missed questions come back more often until you master them.</p>
+      <p id="mistakesInfo" class="small"></p>
+    </section>
+
+    <section id="game" class="card hidden">
+      <div class="question-meta">
+        <span id="catBadge" class="badge"></span>
+        <span id="timer"></span>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><strong id="score">0</strong><span>Score</span></div>
+        <div class="stat"><strong id="streak">0</strong><span>Streak</span></div>
+        <div class="stat"><strong id="best">0</strong><span>Best</span></div>
+        <div class="stat"><strong id="count">0</strong><span>Answered</span></div>
+      </div>
+
+      <div class="ring-wrap">
+        <svg class="ring" viewBox="0 0 120 120" width="104" height="104" aria-hidden="true">
+          <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+          <circle id="ringProgress" class="ring-fill" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="ring-center"><strong id="ringNum">0</strong><span id="ringLabel"></span></div>
+      </div>
+      <div class="small" id="progressText" style="text-align:center"></div>
+
+      <div id="questionText" class="question"></div>
+      <div id="answerArea"></div>
+      <div id="feedback" class="feedback"></div>
+
+      <div class="controls">
+        <button id="submitBtn">Check</button>
+        <button id="nextBtn" class="secondary hidden">Next</button>
+        <button id="resetItemBtn" class="ghost hidden">Reset</button>
+        <button id="stopBtn" class="ghost">Stop</button>
+      </div>
+    </section>
+
+    <section id="summary" class="card hidden">
+      <h2>Practice Summary</h2>
+      <p id="summaryText"></p>
+      <div id="missedBox"></div>
+      <div class="controls">
+        <button id="againBtn">Practice Again</button>
+        <button id="homeBtn" class="secondary">Home</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const BANK = [{"id":"past-1","category":"Past Simple","type":"mcq","prompt":"Yesterday, I ___ my homework before dinner.","answer":"finished","choices":["finish","finished","finishes"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-2","category":"Past Simple","type":"mcq","prompt":"We ___ in a small town before we moved to the city.","answer":"lived","choices":["live","lived","living"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-3","category":"Past Simple","type":"mcq","prompt":"She ___ carefully for the midterm exam.","answer":"studied","choices":["study","studied","studies"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-4","category":"Past Simple","type":"mcq","prompt":"They ___ their group trip very carefully.","answer":"planned","choices":["plan","planned","plans"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-5","category":"Past Simple","type":"mcq","prompt":"He ___ for a scholarship last year.","answer":"applied","choices":["apply","applied","applyed"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-6","category":"Past Simple","type":"mcq","prompt":"We ___ at the hotel for three nights.","answer":"stayed","choices":["stay","stayed","staid"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-7","category":"Past Simple","type":"mcq","prompt":"My brother ___ to the library after class.","answer":"went","choices":["go","went","goes"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-8","category":"Past Simple","type":"mcq","prompt":"The students ___ a new café near campus.","answer":"found","choices":["find","found","finded"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-9","category":"Past Simple","type":"mcq","prompt":"Noor ___ her phone on the bus yesterday.","answer":"lost","choices":["lose","lost","losed"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-10","category":"Past Simple","type":"mcq","prompt":"We ___ a lot of money on our flights.","answer":"spent","choices":["spend","spent","spended"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-11","category":"Past Simple","type":"mcq","prompt":"I ___ an interesting film last night.","answer":"saw","choices":["see","saw","seen"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-12","category":"Past Simple","type":"mcq","prompt":"Sara ___ an email to her teacher this morning.","answer":"wrote","choices":["write","wrote","writed"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-13","category":"Past Simple","type":"mcq","prompt":"The lecture ___ very interesting.","answer":"was","choices":["was","were","did"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-14","category":"Past Simple","type":"mcq","prompt":"The students ___ ready for the presentation.","answer":"were","choices":["was","were","did"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-15","category":"Past Simple","type":"mcq","prompt":"I ___ at the party last night.","answer":"wasn't","choices":["wasn't","weren't","didn't"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-16","category":"Past Simple","type":"mcq","prompt":"We ___ late for the first class.","answer":"weren't","choices":["wasn't","weren't","didn't"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-17","category":"Past Simple","type":"mcq","prompt":"Maha ___ come to university yesterday.","answer":"didn't","choices":["didn't","wasn't","doesn't"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-18","category":"Past Simple","type":"mcq","prompt":"Where ___ you go last weekend?","answer":"did","choices":["did","were","was"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-19","category":"Past Simple","type":"mcq","prompt":"___ she happy with her results?","answer":"Was","choices":["Was","Were","Did"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"past-20","category":"Past Simple","type":"mcq","prompt":"___ they at the meeting yesterday?","answer":"Were","choices":["Was","Were","Did"],"explanation":"الماضي البسيط: الأفعال المنتظمة تنتهي بـ -ed، والأفعال الشاذة لها أشكال خاصة. في النفي والسؤال نستخدم did/didn't مع الفعل في المصدر. مع be نستخدم was/were بدون did."},{"id":"comparative-1","category":"Comparative Adjectives","type":"mcq","prompt":"A text message is usually ___ than an email.","answer":"shorter","choices":["short","shorter","shortest"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-2","category":"Comparative Adjectives","type":"mcq","prompt":"This novel is ___ than the one we read last week.","answer":"longer","choices":["long","longer","longest"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-3","category":"Comparative Adjectives","type":"mcq","prompt":"My new phone is ___ than my old one.","answer":"bigger","choices":["big","bigger","biger"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-4","category":"Comparative Adjectives","type":"mcq","prompt":"Today's exercise was ___ than yesterday's.","answer":"easier","choices":["easy","easier","easyer"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-5","category":"Comparative Adjectives","type":"mcq","prompt":"Doha is ___ than my small hometown.","answer":"larger","choices":["large","larger","largest"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-6","category":"Comparative Adjectives","type":"mcq","prompt":"My results this semester are ___ than last semester.","answer":"better","choices":["good","better","best"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-7","category":"Comparative Adjectives","type":"mcq","prompt":"The traffic this morning was ___ than usual.","answer":"worse","choices":["bad","worse","worst"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-8","category":"Comparative Adjectives","type":"mcq","prompt":"The café on Pearl Street is ___ expensive than the campus café.","answer":"more","choices":["more","most","much"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-9","category":"Comparative Adjectives","type":"mcq","prompt":"Her second presentation was ___ formal than her first.","answer":"more","choices":["more","most","very"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-10","category":"Comparative Adjectives","type":"mcq","prompt":"We usually put the word ___ after a comparative adjective.","answer":"than","choices":["than","then","that"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-11","category":"Comparative Adjectives","type":"mcq","prompt":"My older sister is ___ than me.","answer":"taller","choices":["tall","taller","tallest"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-12","category":"Comparative Adjectives","type":"mcq","prompt":"The library is ___ than the cafeteria.","answer":"quieter","choices":["quiet","quieter","quietest"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-13","category":"Comparative Adjectives","type":"mcq","prompt":"The weather in December is ___ than in summer.","answer":"cooler","choices":["cool","cooler","coolest"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-14","category":"Comparative Adjectives","type":"mcq","prompt":"This laptop is ___ than that one.","answer":"faster","choices":["fast","faster","fastest"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-15","category":"Comparative Adjectives","type":"mcq","prompt":"This old chair is ___ comfortable than the new one.","answer":"less","choices":["less","least","more"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-16","category":"Comparative Adjectives","type":"mcq","prompt":"There are ___ students in class today than yesterday.","answer":"more","choices":["much","more","many"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-17","category":"Comparative Adjectives","type":"mcq","prompt":"The second road is ___ than the first.","answer":"busier","choices":["busy","busier","busyest"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-18","category":"Comparative Adjectives","type":"mcq","prompt":"My health is ___ important than any exam.","answer":"more","choices":["more","most","much"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-19","category":"Comparative Adjectives","type":"mcq","prompt":"This week's homework is ___ than last week's.","answer":"harder","choices":["hard","harder","hardest"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"comparative-20","category":"Comparative Adjectives","type":"mcq","prompt":"The new library is ___ than the old one.","answer":"cleaner","choices":["clean","cleaner","cleanest"],"explanation":"المقارنة: نضيف -er للصفات القصيرة ونستخدم than بعدها. الصفات الطويلة نستخدم معها more/less. صفات شاذة: good→better، bad→worse."},{"id":"linking-1","category":"Linking Words","type":"mcq","prompt":"I love reading ___ I love writing.","answer":"and","choices":["and","but","so"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-2","category":"Linking Words","type":"mcq","prompt":"I wanted to go out, ___ it was raining.","answer":"but","choices":["and","but","because"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-3","category":"Linking Words","type":"mcq","prompt":"I stayed home ___ the weather was hot.","answer":"because","choices":["because","so","and"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-4","category":"Linking Words","type":"mcq","prompt":"The weather was hot, ___ I stayed home.","answer":"so","choices":["so","but","because"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-5","category":"Linking Words","type":"mcq","prompt":"I speak French ___ Spanish.","answer":"and","choices":["and","but","so"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-6","category":"Linking Words","type":"mcq","prompt":"The book was long, ___ it was interesting.","answer":"but","choices":["and","but","because"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-7","category":"Linking Words","type":"mcq","prompt":"We were hungry, ___ we stopped for lunch.","answer":"so","choices":["so","because","and"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-8","category":"Linking Words","type":"mcq","prompt":"We stopped for lunch ___ we were hungry.","answer":"because","choices":["because","so","but"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-9","category":"Linking Words","type":"mcq","prompt":"I finished my essay ___ I sent it to my teacher.","answer":"and","choices":["and","but","because"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-10","category":"Linking Words","type":"mcq","prompt":"She is tired, ___ she will keep working.","answer":"but","choices":["but","so","and"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-11","category":"Linking Words","type":"mcq","prompt":"He failed the test ___ he didn't study.","answer":"because","choices":["because","and","but"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-12","category":"Linking Words","type":"mcq","prompt":"He didn't study, ___ he failed the test.","answer":"so","choices":["so","and","because"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-13","category":"Linking Words","type":"mcq","prompt":"I like tea ___ coffee in the morning.","answer":"and","choices":["and","so","but"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-14","category":"Linking Words","type":"mcq","prompt":"The café was full, ___ we found a table.","answer":"but","choices":["and","but","because"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-15","category":"Linking Words","type":"mcq","prompt":"The café was full, ___ we went somewhere else.","answer":"so","choices":["so","because","and"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-16","category":"Linking Words","type":"mcq","prompt":"We went somewhere else ___ the café was full.","answer":"because","choices":["because","but","and"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-17","category":"Linking Words","type":"mcq","prompt":"Maha plays tennis ___ swims every week.","answer":"and","choices":["and","but","so"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-18","category":"Linking Words","type":"mcq","prompt":"I wanted to call you, ___ I lost your number.","answer":"but","choices":["but","so","and"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-19","category":"Linking Words","type":"mcq","prompt":"I called you ___ I needed your help.","answer":"because","choices":["because","so","but"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"linking-20","category":"Linking Words","type":"mcq","prompt":"I needed your help, ___ I called you.","answer":"so","choices":["so","and","but"],"explanation":"أدوات الربط: and للأفكار المتشابهة، but للتناقض، because للسبب، so للنتيجة."},{"id":"presentcont-1","category":"Present Continuous & Present Simple","type":"mcq","prompt":"Maha ___ English every day.","answer":"studies","choices":["study","studies","studying"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-2","category":"Present Continuous & Present Simple","type":"mcq","prompt":"Look! It ___ now.","answer":"is raining","choices":["rains","is raining","raining"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-3","category":"Present Continuous & Present Simple","type":"mcq","prompt":"We usually ___ to university by bus.","answer":"go","choices":["go","goes","going"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-4","category":"Present Continuous & Present Simple","type":"mcq","prompt":"Right now, I ___ in the library.","answer":"am studying","choices":["study","am studying","studying"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-5","category":"Present Continuous & Present Simple","type":"mcq","prompt":"My brother ___ coffee every morning.","answer":"drinks","choices":["drink","drinks","drinking"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-6","category":"Present Continuous & Present Simple","type":"mcq","prompt":"Listen! Someone ___ the piano.","answer":"is playing","choices":["plays","is playing","playing"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-7","category":"Present Continuous & Present Simple","type":"mcq","prompt":"She ___ not like fast food.","answer":"does","choices":["does","is","do"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-8","category":"Present Continuous & Present Simple","type":"mcq","prompt":"They ___ watching a film at the moment.","answer":"are","choices":["are","is","do"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-9","category":"Present Continuous & Present Simple","type":"mcq","prompt":"The sun ___ in the east every day.","answer":"rises","choices":["rise","rises","rising"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-10","category":"Present Continuous & Present Simple","type":"mcq","prompt":"Be quiet! The baby ___.","answer":"is sleeping","choices":["sleeps","is sleeping","sleeping"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-11","category":"Present Continuous & Present Simple","type":"mcq","prompt":"I ___ my homework after dinner every day.","answer":"do","choices":["do","does","am doing"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-12","category":"Present Continuous & Present Simple","type":"mcq","prompt":"Where ___ you going now?","answer":"are","choices":["are","do","is"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-13","category":"Present Continuous & Present Simple","type":"mcq","prompt":"He ___ football on Fridays.","answer":"plays","choices":["play","plays","playing"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-14","category":"Present Continuous & Present Simple","type":"mcq","prompt":"At the moment, we ___ for the exam.","answer":"are studying","choices":["study","are studying","studying"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-15","category":"Present Continuous & Present Simple","type":"mcq","prompt":"Water ___ at 100°C.","answer":"boils","choices":["boil","boils","boiling"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-16","category":"Present Continuous & Present Simple","type":"mcq","prompt":"Sara ___ a message to her friend right now.","answer":"is writing","choices":["writes","is writing","writing"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-17","category":"Present Continuous & Present Simple","type":"mcq","prompt":"___ she live near the university?","answer":"Does","choices":["Do","Does","Is"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-18","category":"Present Continuous & Present Simple","type":"mcq","prompt":"Today, I ___ a blue dress.","answer":"am wearing","choices":["wear","am wearing","wearing"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-19","category":"Present Continuous & Present Simple","type":"mcq","prompt":"My parents ___ in Doha.","answer":"live","choices":["live","lives","are living"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"presentcont-20","category":"Present Continuous & Present Simple","type":"mcq","prompt":"What ___ you usually do on weekends?","answer":"do","choices":["do","are","does"],"explanation":"المضارع البسيط للعادات مع كلمات مثل every day، ونضيف s مع he/she/it. المضارع المستمر للأحداث الآن مع now/at the moment، ونستخدم am/is/are + الفعل+ing."},{"id":"canhaveto-1","category":"Can / Have to","type":"mcq","prompt":"You ___ use a dictionary in this class.","answer":"can","choices":["can","have","do"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-2","category":"Can / Have to","type":"mcq","prompt":"Students ___ cheat during the exam.","answer":"can't","choices":["can't","don't","aren't"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-3","category":"Can / Have to","type":"mcq","prompt":"You ___ to bring your own backpack for the trip.","answer":"have","choices":["have","can","do"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-4","category":"Can / Have to","type":"mcq","prompt":"You ___ have to bring a tent; we have one.","answer":"don't","choices":["don't","can't","aren't"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-5","category":"Can / Have to","type":"mcq","prompt":"___ I ask a question?","answer":"Can","choices":["Can","Do","Have"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-6","category":"Can / Have to","type":"mcq","prompt":"She ___ to study for many years to become a doctor.","answer":"has","choices":["has","have","can"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-7","category":"Can / Have to","type":"mcq","prompt":"You ___ speak the local language, but it helps.","answer":"don't have to","choices":["have to","don't have to","can't"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-8","category":"Can / Have to","type":"mcq","prompt":"In the library, you ___ talk loudly.","answer":"can't","choices":["can","can't","don't"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-9","category":"Can / Have to","type":"mcq","prompt":"___ you help me with this essay?","answer":"Can","choices":["Can","Do","Have"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-10","category":"Can / Have to","type":"mcq","prompt":"___ your essay have to include a reference list?","answer":"Does","choices":["Does","Do","Is"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-11","category":"Can / Have to","type":"mcq","prompt":"We ___ arrive at 8 a.m. every day.","answer":"have to","choices":["have to","can","don't"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-12","category":"Can / Have to","type":"mcq","prompt":"You ___ copy another student's work.","answer":"can't","choices":["can't","don't","aren't"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-13","category":"Can / Have to","type":"mcq","prompt":"Breakfast is provided, so you ___ buy your own.","answer":"don't have to","choices":["have to","don't have to","can't"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-14","category":"Can / Have to","type":"mcq","prompt":"___ we have to wear a uniform?","answer":"Do","choices":["Do","Does","Can"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-15","category":"Can / Have to","type":"mcq","prompt":"He ___ swim very well.","answer":"can","choices":["can","has","does"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-16","category":"Can / Have to","type":"mcq","prompt":"You ___ drive without a licence.","answer":"can't","choices":["can't","don't","aren't"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-17","category":"Can / Have to","type":"mcq","prompt":"She ___ have to wait in the queue; she has a ticket.","answer":"doesn't","choices":["doesn't","don't","isn't"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-18","category":"Can / Have to","type":"mcq","prompt":"___ Haya graduate this year?","answer":"Can","choices":["Can","Does","Has"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-19","category":"Can / Have to","type":"mcq","prompt":"You ___ keep your licence with you when you drive.","answer":"have to","choices":["have to","don't","can't"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"canhaveto-20","category":"Can / Have to","type":"mcq","prompt":"We ___ use our phones during the lecture.","answer":"can't","choices":["can't","don't","aren't"],"explanation":"can للقدرة أو الإذن، وcan't للمنع. have to للالتزام (has to مع he/she/it). don't/doesn't have to تعني لا يوجد إلزام. في السؤال نستخدم do/does مع have to."},{"id":"verbprep-1","category":"Verbs & Prepositions","type":"mcq","prompt":"Can we agree ___ the topic of our presentation?","answer":"on","choices":["on","in","at"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-2","category":"Verbs & Prepositions","type":"mcq","prompt":"I don't know much ___ this country.","answer":"about","choices":["about","of","on"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-3","category":"Verbs & Prepositions","type":"mcq","prompt":"This phone belongs ___ Zainab.","answer":"to","choices":["to","for","with"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-4","category":"Verbs & Prepositions","type":"mcq","prompt":"They didn't succeed ___ persuading the professor.","answer":"in","choices":["in","on","at"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-5","category":"Verbs & Prepositions","type":"mcq","prompt":"We arrived ___ very different conclusions.","answer":"at","choices":["at","to","in"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-6","category":"Verbs & Prepositions","type":"mcq","prompt":"I'm still waiting ___ her to call me.","answer":"for","choices":["for","to","at"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-7","category":"Verbs & Prepositions","type":"mcq","prompt":"We need to separate the liquid ___ the solid.","answer":"from","choices":["from","of","with"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-8","category":"Verbs & Prepositions","type":"mcq","prompt":"I want to compare today ___ the past.","answer":"with","choices":["with","to","on"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-9","category":"Verbs & Prepositions","type":"mcq","prompt":"She always listens ___ her teacher.","answer":"to","choices":["to","for","at"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-10","category":"Verbs & Prepositions","type":"mcq","prompt":"I borrowed some money ___ my father.","answer":"from","choices":["from","of","by"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-11","category":"Verbs & Prepositions","type":"mcq","prompt":"Please concentrate ___ your work.","answer":"on","choices":["on","in","at"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-12","category":"Verbs & Prepositions","type":"mcq","prompt":"He apologised ___ arriving late.","answer":"for","choices":["for","to","about"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-13","category":"Verbs & Prepositions","type":"mcq","prompt":"Many students worry ___ their grades.","answer":"about","choices":["about","on","of"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-14","category":"Verbs & Prepositions","type":"mcq","prompt":"Do you believe ___ hard work?","answer":"in","choices":["in","on","at"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-15","category":"Verbs & Prepositions","type":"mcq","prompt":"I need to talk ___ my advisor.","answer":"to","choices":["to","with","for"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-16","category":"Verbs & Prepositions","type":"mcq","prompt":"She graduated ___ Qatar University last year.","answer":"from","choices":["from","of","at"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-17","category":"Verbs & Prepositions","type":"mcq","prompt":"Let's not argue ___ small things.","answer":"about","choices":["about","on","for"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-18","category":"Verbs & Prepositions","type":"mcq","prompt":"Can you help me ___ my homework?","answer":"with","choices":["with","to","on"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-19","category":"Verbs & Prepositions","type":"mcq","prompt":"The result depends ___ your effort.","answer":"on","choices":["on","in","of"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-20","category":"Verbs & Prepositions","type":"mcq","prompt":"Everyone laughed ___ the funny video.","answer":"at","choices":["at","on","to"],"explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-21","category":"Verbs & Prepositions","type":"match","prompt":"Match each verb to the correct preposition.","pairs":[["agree ___ a plan","on"],["belong ___ someone","to"],["wait ___ the bus","for"],["arrive ___ the airport","at"],["borrow ___ a friend","from"]],"answer":"agree on a plan; belong to someone; wait for the bus; arrive at the airport; borrow from a friend","explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-22","category":"Verbs & Prepositions","type":"match","prompt":"Match each verb to the correct preposition.","pairs":[["believe ___ hard work","in"],["help ___ the homework","with"],["worry ___ the exam","about"],["laugh ___ a joke","at"],["graduate ___ university","from"]],"answer":"believe in hard work; help with the homework; worry about the exam; laugh at a joke; graduate from university","explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-23","category":"Verbs & Prepositions","type":"match","prompt":"Match each verb to the correct preposition.","pairs":[["concentrate ___ your work","on"],["apologise ___ a mistake","for"],["talk ___ your teacher","to"],["succeed ___ your studies","in"],["compare ___ the past","with"]],"answer":"concentrate on your work; apologise for a mistake; talk to your teacher; succeed in your studies; compare with the past","explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-24","category":"Verbs & Prepositions","type":"match","prompt":"Match each verb to the correct preposition.","pairs":[["depend ___ your effort","on"],["care ___ your friends","about"],["pay ___ the meal","for"],["listen ___ the teacher","to"],["protect ___ danger","from"]],"answer":"depend on your effort; care about your friends; pay for the meal; listen to the teacher; protect from danger","explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"verbprep-25","category":"Verbs & Prepositions","type":"match","prompt":"Match each verb to the correct preposition.","pairs":[["argue ___ politics","about"],["look ___ the board","at"],["connect ___ the internet","to"],["hope ___ good news","for"],["participate ___ the class","in"]],"answer":"argue about politics; look at the board; connect to the internet; hope for good news; participate in the class","explanation":"بعض الأفعال تأتي مع حرف جر ثابت: agree on، belong to، wait for، borrow from، concentrate on، worry about، depend on، graduate from. احفظ الفعل مع حرف الجر."},{"id":"sequencing-1","category":"Sequencing Words","type":"mcq","prompt":"___, they pick the coffee beans.","answer":"First","choices":["First","Finally","Then"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-2","category":"Sequencing Words","type":"mcq","prompt":"First, wash the rice. ___, add the water.","answer":"Then","choices":["Then","First","Finally"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-3","category":"Sequencing Words","type":"mcq","prompt":"___ of all, you should read the question carefully.","answer":"First","choices":["First","Last","After"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-4","category":"Sequencing Words","type":"mcq","prompt":"We wrote the report. ___, we sent it to the manager.","answer":"After that","choices":["After that","First","Firstly"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-5","category":"Sequencing Words","type":"mcq","prompt":"___, the management study the proposal.","answer":"Next","choices":["Next","First","Finally"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-6","category":"Sequencing Words","type":"mcq","prompt":"She finished her degree. ___, she found a job.","answer":"Afterwards","choices":["Afterwards","First","Initially"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-7","category":"Sequencing Words","type":"mcq","prompt":"___, I want to thank everyone for coming.","answer":"First of all","choices":["First of all","Finally","After that"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-8","category":"Sequencing Words","type":"mcq","prompt":"Do your research. ___, write your first draft.","answer":"Then","choices":["Then","First","Initially"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-9","category":"Sequencing Words","type":"mcq","prompt":"___, and most importantly, always check your work.","answer":"Finally","choices":["Finally","First","Next"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-10","category":"Sequencing Words","type":"mcq","prompt":"___, the city improved the roads. Afterwards, it grew quickly.","answer":"First","choices":["First","Finally","Then"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-11","category":"Sequencing Words","type":"mcq","prompt":"We had dinner. ___, we watched a film.","answer":"Then","choices":["Then","First","Firstly"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-12","category":"Sequencing Words","type":"mcq","prompt":"___, the students choose a topic. Then they do research.","answer":"First","choices":["First","Finally","Lastly"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-13","category":"Sequencing Words","type":"mcq","prompt":"Boil the pasta. ___, add the sauce.","answer":"After that","choices":["After that","First of all","Initially"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-14","category":"Sequencing Words","type":"mcq","prompt":"___, we packed our bags. Finally, we left for the airport.","answer":"First","choices":["First","Finally","Lastly"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-15","category":"Sequencing Words","type":"mcq","prompt":"He studied hard all year. ___, he passed with a high grade.","answer":"Finally","choices":["Finally","First","Initially"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-16","category":"Sequencing Words","type":"mcq","prompt":"___, let me introduce today's topic.","answer":"First","choices":["First","Finally","Afterwards"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-17","category":"Sequencing Words","type":"mcq","prompt":"Write your notes. ___, organise them into paragraphs.","answer":"Next","choices":["Next","First","Initially"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-18","category":"Sequencing Words","type":"mcq","prompt":"___, the beans are dried. Then they are roasted.","answer":"First","choices":["First","Finally","Lastly"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-19","category":"Sequencing Words","type":"mcq","prompt":"We visited three cities. ___, we returned home.","answer":"Finally","choices":["Finally","First","Initially"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-20","category":"Sequencing Words","type":"mcq","prompt":"___, the beans are packaged and shipped to shops.","answer":"Finally","choices":["Finally","First","Next"],"explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-21","category":"Sequencing Words","type":"order","prompt":"Use the sequencing words to order how Maryam makes tea.","steps":["First, Maryam boils the water.","Then, she puts a tea bag in a cup.","Next, she pours the water into the cup.","After that, she waits for two minutes.","Finally, she drinks the tea."],"answer":"First, Maryam boils the water. → Then, she puts a tea bag in a cup. → Next, she pours the water into the cup. → After that, she waits for two minutes. → Finally, she drinks the tea.","explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-22","category":"Sequencing Words","type":"order","prompt":"Use the sequencing words to order how Rashid wrote his essay.","steps":["First, Rashid chose his topic.","Then, he did his research.","Next, he wrote the first draft.","After that, he checked for mistakes.","Finally, he handed in his essay."],"answer":"First, Rashid chose his topic. → Then, he did his research. → Next, he wrote the first draft. → After that, he checked for mistakes. → Finally, he handed in his essay.","explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-23","category":"Sequencing Words","type":"order","prompt":"Use the sequencing words to order Sara's morning routine.","steps":["First, Sara wakes up early.","Then, she has breakfast.","After that, she takes the bus to university.","Finally, she goes to her first lecture."],"answer":"First, Sara wakes up early. → Then, she has breakfast. → After that, she takes the bus to university. → Finally, she goes to her first lecture.","explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-24","category":"Sequencing Words","type":"order","prompt":"Use the sequencing words to order how Mohammed planned his trip.","steps":["First, Mohammed chose a destination.","Then, he booked the flights.","After that, he packed his bags.","Finally, he travelled to the airport."],"answer":"First, Mohammed chose a destination. → Then, he booked the flights. → After that, he packed his bags. → Finally, he travelled to the airport.","explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-25","category":"Sequencing Words","type":"order","prompt":"Use the sequencing words to order how Noora did her experiment.","steps":["First, Noora read the instructions.","Then, she collected the equipment.","After that, she did the experiment.","Finally, she wrote her results."],"answer":"First, Noora read the instructions. → Then, she collected the equipment. → After that, she did the experiment. → Finally, she wrote her results.","explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-26","category":"Sequencing Words","type":"order","prompt":"Use the sequencing words to order how Ahmed studies.","steps":["First, Ahmed reads the chapter.","Then, he takes notes.","Next, he answers the questions.","After that, he checks his answers.","Finally, he reviews his mistakes."],"answer":"First, Ahmed reads the chapter. → Then, he takes notes. → Next, he answers the questions. → After that, he checks his answers. → Finally, he reviews his mistakes.","explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-27","category":"Sequencing Words","type":"wordfill","prompt":"Choose the correct sequencing word for each step of Sara making a cake.","blanks":[{"sentence":"___ Sara mixed the flour and eggs.","answer":"First","choices":["First","After that","Finally"]},{"sentence":"___ she poured the mixture into a tin.","answer":"Then","choices":["Then","First","Finally"]},{"sentence":"___ she put the tin in the oven.","answer":"Next","choices":["Next","First","Finally"]},{"sentence":"___ she waited for thirty minutes.","answer":"After that","choices":["After that","First","Finally"]},{"sentence":"___ she ate a piece of cake.","answer":"Finally","choices":["Finally","First","Then"]}],"answer":"First → Then → Next → After that → Finally","explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-28","category":"Sequencing Words","type":"wordfill","prompt":"Choose the correct sequencing word for each step of Ahmed washing his car.","blanks":[{"sentence":"___ Ahmed fills a bucket with water.","answer":"First","choices":["First","Then","Finally"]},{"sentence":"___ he cleans the windows.","answer":"Then","choices":["Then","First","Finally"]},{"sentence":"___ he washes the doors.","answer":"After that","choices":["After that","First","Finally"]},{"sentence":"___ he dries the car.","answer":"Finally","choices":["Finally","First","Next"]}],"answer":"First → Then → After that → Finally","explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-29","category":"Sequencing Words","type":"wordfill","prompt":"Choose the correct sequencing word for each step of Noora cooking rice.","blanks":[{"sentence":"___ Noora washes the rice.","answer":"First","choices":["First","Next","Finally"]},{"sentence":"___ she adds water to the pot.","answer":"Then","choices":["Then","First","Finally"]},{"sentence":"___ she boils the rice for twenty minutes.","answer":"Next","choices":["Next","First","Finally"]},{"sentence":"___ she serves the rice.","answer":"Finally","choices":["Finally","First","Then"]}],"answer":"First → Then → Next → Finally","explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-30","category":"Sequencing Words","type":"wordfill","prompt":"Choose the correct sequencing word for each step of Mohammed booking a hotel.","blanks":[{"sentence":"___ Mohammed searched for a hotel online.","answer":"First","choices":["First","After that","Finally"]},{"sentence":"___ he compared the prices.","answer":"Then","choices":["Then","First","Finally"]},{"sentence":"___ he chose the best hotel.","answer":"Next","choices":["Next","First","Finally"]},{"sentence":"___ he paid for the room.","answer":"Finally","choices":["Finally","First","Then"]}],"answer":"First → Then → Next → Finally","explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-31","category":"Sequencing Words","type":"wordfill","prompt":"Choose the correct sequencing word for each step of Maryam preparing for an exam.","blanks":[{"sentence":"___ Maryam read her notes.","answer":"First","choices":["First","Then","Finally"]},{"sentence":"___ she made a study plan.","answer":"Then","choices":["Then","First","Finally"]},{"sentence":"___ she practised past questions.","answer":"After that","choices":["After that","First","Finally"]},{"sentence":"___ she took the exam.","answer":"Finally","choices":["Finally","First","Next"]}],"answer":"First → Then → After that → Finally","explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"sequencing-32","category":"Sequencing Words","type":"wordfill","prompt":"Choose the correct sequencing word for each step of Rashid sending an email.","blanks":[{"sentence":"___ Rashid opens his laptop.","answer":"First","choices":["First","Next","Finally"]},{"sentence":"___ he writes the message.","answer":"Then","choices":["Then","First","Finally"]},{"sentence":"___ he checks his spelling.","answer":"Next","choices":["Next","First","Finally"]},{"sentence":"___ he sends the email.","answer":"Finally","choices":["Finally","First","Then"]}],"answer":"First → Then → Next → Finally","explanation":"كلمات الترتيب الزمني: First/First of all/Initially للبداية، وNext/Then/After that/Afterwards للخطوات التالية، وFinally/Lastly/Last of all للنهاية. توضع عادة في بداية الجملة وبعدها فاصلة."},{"id":"discourse-1","category":"Discourse Markers","type":"mcq","prompt":"A: I finished the report. B: ___, that's great news.","answer":"Right","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-2","category":"Discourse Markers","type":"mcq","prompt":"A: I need to ask you something. ___, can you help me on Sunday?","answer":"So","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-3","category":"Discourse Markers","type":"mcq","prompt":"A: ...and that's my holiday news. ___, how are you?","answer":"Anyway","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-4","category":"Discourse Markers","type":"mcq","prompt":"A: The meeting is at three. B: ___, I'll be there.","answer":"Right","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-5","category":"Discourse Markers","type":"mcq","prompt":"___, let's get started with today's lesson.","answer":"So","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-6","category":"Discourse Markers","type":"mcq","prompt":"We talked for an hour about films. ___, I should go now.","answer":"Anyway","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-7","category":"Discourse Markers","type":"mcq","prompt":"A: We're moving to a new flat. B: ___, when is the move?","answer":"Right","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-8","category":"Discourse Markers","type":"mcq","prompt":"___, the reason I called is to invite you to dinner.","answer":"So","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-9","category":"Discourse Markers","type":"mcq","prompt":"A: I love this song. ___, what were we saying about the project?","answer":"Anyway","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-10","category":"Discourse Markers","type":"mcq","prompt":"A: Your idea sounds good. B: ___, let's try it.","answer":"Right","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-11","category":"Discourse Markers","type":"mcq","prompt":"___, I've decided to ask for a loan for a new car.","answer":"So","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-12","category":"Discourse Markers","type":"mcq","prompt":"That's enough about me. ___, tell me about your trip.","answer":"Anyway","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-13","category":"Discourse Markers","type":"mcq","prompt":"A: The café closes at ten. B: ___, we have plenty of time.","answer":"Right","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-14","category":"Discourse Markers","type":"mcq","prompt":"___, here's what I wanted to talk about today.","answer":"So","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-15","category":"Discourse Markers","type":"mcq","prompt":"We can discuss the details later. ___, are you free tomorrow?","answer":"Anyway","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-16","category":"Discourse Markers","type":"mcq","prompt":"A: The class starts at nine. B: ___, I'll be there on time.","answer":"Right","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-17","category":"Discourse Markers","type":"mcq","prompt":"___, I was thinking we could meet on Thursday.","answer":"So","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-18","category":"Discourse Markers","type":"mcq","prompt":"It was a long story. ___, everything is fine now.","answer":"Anyway","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-19","category":"Discourse Markers","type":"mcq","prompt":"A: The bus leaves at eight. B: ___, we should leave now.","answer":"Right","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"discourse-20","category":"Discourse Markers","type":"mcq","prompt":"___, let me explain why this matters.","answer":"So","choices":["Right","Anyway","So"],"explanation":"علامات الخطاب في المحادثة: so لبدء نقطة جديدة أو الدخول في صلب الموضوع، وright للموافقة أو الرد، وanyway لتغيير الموضوع أو الانتقال."},{"id":"willoffer-1","category":"Will (Offers of Help)","type":"mcq","prompt":"A: I don't understand this word. B: I ___ google it for you.","answer":"will","choices":["will","am","do"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-2","category":"Will (Offers of Help)","type":"mcq","prompt":"A: I can't fix the computer. B: I'll ___ IT support for you.","answer":"contact","choices":["contact","contacts","contacting"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-3","category":"Will (Offers of Help)","type":"mcq","prompt":"A: I forgot my wallet. B: I'll ___ the bill for you.","answer":"pay","choices":["pay","pays","paying"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-4","category":"Will (Offers of Help)","type":"mcq","prompt":"A: I lost my pen. B: I'll ___ you mine.","answer":"lend","choices":["lend","lends","lending"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-5","category":"Will (Offers of Help)","type":"mcq","prompt":"A: I'm thirsty. B: I ___ get you some water.","answer":"will","choices":["will","am","do"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-6","category":"Will (Offers of Help)","type":"mcq","prompt":"A: My car is broken. B: I'll ___ you a lift.","answer":"give","choices":["give","gives","giving"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-7","category":"Will (Offers of Help)","type":"mcq","prompt":"A: This bag is heavy. B: I'll ___ it for you.","answer":"carry","choices":["carry","carries","carrying"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-8","category":"Will (Offers of Help)","type":"mcq","prompt":"A: I'm cold. B: I ___ close the window.","answer":"will","choices":["will","am","do"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-9","category":"Will (Offers of Help)","type":"mcq","prompt":"A: I can't reach the top shelf. B: I'll ___ you.","answer":"help","choices":["help","helps","helping"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-10","category":"Will (Offers of Help)","type":"mcq","prompt":"A: The phone is ringing. B: I ___ answer it.","answer":"will","choices":["will","do","am"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-11","category":"Will (Offers of Help)","type":"mcq","prompt":"We'll ___ your dog to the park.","answer":"take","choices":["take","takes","taking"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-12","category":"Will (Offers of Help)","type":"mcq","prompt":"Dad will ___ you carry the shopping.","answer":"help","choices":["help","helps","helping"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-13","category":"Will (Offers of Help)","type":"mcq","prompt":"They'll ___ your computer home for you.","answer":"bring","choices":["bring","brings","bringing"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-14","category":"Will (Offers of Help)","type":"mcq","prompt":"She'll ___ Nadia with her writing tonight.","answer":"help","choices":["help","helps","helping"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-15","category":"Will (Offers of Help)","type":"mcq","prompt":"A: I don't know the answer. B: I'll ___ it for you.","answer":"find","choices":["find","finds","finding"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-16","category":"Will (Offers of Help)","type":"mcq","prompt":"A: I'm hungry. B: I ___ make you a sandwich.","answer":"will","choices":["will","am","do"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-17","category":"Will (Offers of Help)","type":"mcq","prompt":"A: My email isn't working. B: I'll ___ IT support.","answer":"call","choices":["call","calls","calling"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-18","category":"Will (Offers of Help)","type":"mcq","prompt":"A: I need to read something new. B: I'll ___ you my book.","answer":"lend","choices":["lend","lends","lending"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-19","category":"Will (Offers of Help)","type":"mcq","prompt":"A: It's dark in here. B: I ___ turn on the light.","answer":"will","choices":["will","do","am"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"willoffer-20","category":"Will (Offers of Help)","type":"mcq","prompt":"A: I can't carry all these books. B: I'll ___ some for you.","answer":"take","choices":["take","takes","taking"],"explanation":"نستخدم will لعرض المساعدة في لحظة الكلام. التركيب: الفاعل + will + الفعل في المصدر بدون s أو ing. و'll هي الاختصار من will."},{"id":"superlative-1","category":"Superlative Adjectives","type":"mcq","prompt":"That was one of the ___ topics this year.","answer":"most difficult","choices":["more difficult","most difficult","difficultest"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-2","category":"Superlative Adjectives","type":"mcq","prompt":"Looking back, that was the ___ time of my life.","answer":"happiest","choices":["happier","happiest","most happy"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-3","category":"Superlative Adjectives","type":"mcq","prompt":"Giving up is the ___ thing you can do.","answer":"worst","choices":["worse","worst","baddest"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-4","category":"Superlative Adjectives","type":"mcq","prompt":"His last book was the ___ one so far.","answer":"most interesting","choices":["more interesting","most interesting","interestingest"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-5","category":"Superlative Adjectives","type":"mcq","prompt":"What is our ___ goal?","answer":"most important","choices":["more important","most important","importantest"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-6","category":"Superlative Adjectives","type":"mcq","prompt":"This is the ___ test we've had this year.","answer":"easiest","choices":["easier","easiest","most easy"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-7","category":"Superlative Adjectives","type":"mcq","prompt":"This is the ___ house I've ever seen.","answer":"most beautiful","choices":["more beautiful","most beautiful","beautifullest"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-8","category":"Superlative Adjectives","type":"mcq","prompt":"This hotel is the ___ one we saw.","answer":"best","choices":["better","best","goodest"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-9","category":"Superlative Adjectives","type":"mcq","prompt":"He is the ___ person I know.","answer":"richest","choices":["richer","richest","most rich"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-10","category":"Superlative Adjectives","type":"mcq","prompt":"This is the ___ phone in the shop.","answer":"most expensive","choices":["more expensive","most expensive","expensivest"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-11","category":"Superlative Adjectives","type":"mcq","prompt":"Everest is the ___ mountain in the world.","answer":"highest","choices":["higher","highest","most high"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-12","category":"Superlative Adjectives","type":"mcq","prompt":"This is the ___ building in Doha.","answer":"tallest","choices":["taller","tallest","most tall"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-13","category":"Superlative Adjectives","type":"mcq","prompt":"That was the ___ day of the trip.","answer":"longest","choices":["longer","longest","most long"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-14","category":"Superlative Adjectives","type":"mcq","prompt":"She is the ___ student in the class.","answer":"cleverest","choices":["cleverer","cleverest","most clever"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-15","category":"Superlative Adjectives","type":"mcq","prompt":"This is the ___ restaurant in the city.","answer":"most popular","choices":["more popular","most popular","popularest"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-16","category":"Superlative Adjectives","type":"mcq","prompt":"That was the ___ film I have ever seen.","answer":"worst","choices":["worse","worst","most bad"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-17","category":"Superlative Adjectives","type":"mcq","prompt":"Today is the ___ day of the year.","answer":"hottest","choices":["hoter","hottest","most hot"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-18","category":"Superlative Adjectives","type":"mcq","prompt":"This is the ___ way to the station.","answer":"furthest","choices":["farther","furthest","most far"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-19","category":"Superlative Adjectives","type":"mcq","prompt":"He is the ___ runner on the team.","answer":"fastest","choices":["faster","fastest","most fast"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."},{"id":"superlative-20","category":"Superlative Adjectives","type":"mcq","prompt":"It was the ___ experience of my life.","answer":"most amazing","choices":["more amazing","most amazing","amazingest"],"explanation":"التفضيل: نضيف -est للصفات القصيرة مع the. الصفات الطويلة نستخدم معها the most/the least. صفات شاذة: good→the best، bad→the worst، far→the furthest."}];
+
+    /* ---------- safe storage (never throws; falls back to in-memory) ---------- */
+    const store = (function(){
+      let ok = true;
+      try { const k = "__engl111_t"; window.localStorage.setItem(k, "1"); window.localStorage.removeItem(k); }
+      catch(e){ ok = false; }
+      const mem = {};
+      return {
+        get(k){ try { return ok ? window.localStorage.getItem(k) : (k in mem ? mem[k] : null); } catch(e){ return (k in mem ? mem[k] : null); } },
+        set(k,v){ try { if(ok) window.localStorage.setItem(k, String(v)); else mem[k] = String(v); } catch(e){ mem[k] = String(v); } },
+        remove(k){ try { if(ok) window.localStorage.removeItem(k); else delete mem[k]; } catch(e){ delete mem[k]; } }
+      };
+    })();
+
+    /* ---------- element refs ---------- */
+    const categorySelect = document.getElementById("category");
+    const categories = ["All Grammar", ...new Set(BANK.map(q=>q.category))];
+    categories.forEach(c=>{
+      const opt=document.createElement("option");
+      opt.value=c; opt.textContent=c; categorySelect.appendChild(opt);
+    });
+
+    const els = {
+      setup:document.getElementById("setup"), game:document.getElementById("game"), summary:document.getElementById("summary"),
+      startBtn:document.getElementById("startBtn"), soundBtn:document.getElementById("soundBtn"),
+      resetBestBtn:document.getElementById("resetBestBtn"), resetProgressBtn:document.getElementById("resetProgressBtn"),
+      mode:document.getElementById("mode"), mistakesInfo:document.getElementById("mistakesInfo"),
+      catBadge:document.getElementById("catBadge"), timer:document.getElementById("timer"),
+      score:document.getElementById("score"), streak:document.getElementById("streak"), best:document.getElementById("best"), count:document.getElementById("count"),
+      ringProgress:document.getElementById("ringProgress"), ringNum:document.getElementById("ringNum"), ringLabel:document.getElementById("ringLabel"),
+      progressText:document.getElementById("progressText"),
+      questionText:document.getElementById("questionText"), answerArea:document.getElementById("answerArea"),
+      feedback:document.getElementById("feedback"), submitBtn:document.getElementById("submitBtn"), nextBtn:document.getElementById("nextBtn"),
+      resetItemBtn:document.getElementById("resetItemBtn"), stopBtn:document.getElementById("stopBtn"),
+      summaryText:document.getElementById("summaryText"), missedBox:document.getElementById("missedBox"),
+      againBtn:document.getElementById("againBtn"), homeBtn:document.getElementById("homeBtn"),
+      confetti:document.getElementById("confetti")
+    };
+
+    /* ---------- feature 1: sound, haptics, confetti, praise ---------- */
+    let soundOn = store.get("engl111MidSound") !== "off";
+    function refreshSoundBtn(){ els.soundBtn.textContent = "Sound: " + (soundOn ? "On" : "Off"); }
+    refreshSoundBtn();
+
+    let audioCtx = null;
+    function sfx(kind){
+      if(!soundOn) return;
+      try{
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if(audioCtx.state === "suspended") audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const beep = (freqA, freqB, type, t0, dur, vol) => {
+          const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+          o.connect(g); g.connect(audioCtx.destination);
+          o.type = type; o.frequency.setValueAtTime(freqA, t0);
+          if(freqB) o.frequency.exponentialRampToValueAtTime(freqB, t0 + dur);
+          g.gain.setValueAtTime(0.0001, t0);
+          g.gain.exponentialRampToValueAtTime(vol, t0 + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+          o.start(t0); o.stop(t0 + dur + 0.02);
+        };
+        if(kind === "correct"){ beep(660, 990, "sine", now, 0.18, 0.22); }
+        else if(kind === "wrong"){ beep(220, 120, "triangle", now, 0.28, 0.18); }
+        else if(kind === "win"){ [523,659,784,1047].forEach((f,i)=>beep(f, null, "sine", now + i*0.09, 0.2, 0.2)); }
+      }catch(e){}
+    }
+    function buzz(pattern){ if(soundOn && navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} } }
+
+    const cctx = els.confetti.getContext("2d");
+    let confettiRAF = null;
+    function launchConfetti(){
+      if(!cctx) return;
+      const W = els.confetti.width = window.innerWidth;
+      const H = els.confetti.height = window.innerHeight;
+      els.confetti.style.display = "block";
+      const colors = ["#8A1538","#c94d73","#e8b53e","#2f9e6f","#3a6ea5","#e8e1da"];
+      const parts = [];
+      for(let i=0;i<80;i++){
+        parts.push({ x:Math.random()*W, y:-20-Math.random()*H*0.3, r:4+Math.random()*6,
+          c:colors[i%colors.length], vy:2+Math.random()*3.5, vx:-1.6+Math.random()*3.2,
+          rot:Math.random()*6.28, vr:-0.2+Math.random()*0.4 });
+      }
+      cancelAnimationFrame(confettiRAF);
+      const start = performance.now();
+      (function frame(now){
+        const t = now - start;
+        cctx.clearRect(0,0,W,H);
+        parts.forEach(p=>{
+          p.x+=p.vx; p.y+=p.vy; p.vy+=0.03; p.rot+=p.vr;
+          cctx.save(); cctx.translate(p.x,p.y); cctx.rotate(p.rot);
+          cctx.fillStyle=p.c; cctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.65); cctx.restore();
+        });
+        if(t < 1500){ confettiRAF = requestAnimationFrame(frame); }
+        else { cctx.clearRect(0,0,W,H); els.confetti.style.display="none"; }
+      })(start);
+    }
+
+    const PRAISE = ["Nice! 👏","On fire! 🔥","Perfect!","Well done!","Keep going!","Brilliant!","Great job!","أحسنتِ! 🌟","ممتاز!","رائع!"];
+    function randomPraise(){ return PRAISE[Math.floor(Math.random()*PRAISE.length)]; }
+
+    function animateNumber(el, from, to){
+      const start = performance.now(), dur = 400;
+      (function step(now){
+        const p = Math.min(1, (now-start)/dur);
+        el.textContent = Math.round(from + (to-from)*p);
+        if(p<1) requestAnimationFrame(step);
+      })(start);
+    }
+
+    /* ---------- feature 2: spaced repetition (Leitner) ---------- */
+    const SR_KEY = "engl111MidSR";
+    function loadSR(){ try{ return JSON.parse(store.get(SR_KEY)) || {}; }catch(e){ return {}; } }
+    function saveSR(sr){ try{ store.set(SR_KEY, JSON.stringify(sr)); }catch(e){} }
+    function boxOf(sr, id){ return (sr[id] && sr[id].box) ? sr[id].box : 1; }
+    function recordResult(id, ok){
+      const sr = loadSR();
+      const rec = sr[id] || { box:1, right:0, wrong:0 };
+      if(ok){ rec.box = Math.min(5, (rec.box||1) + 1); rec.right = (rec.right||0) + 1; }
+      else  { rec.box = 1; rec.wrong = (rec.wrong||0) + 1; }
+      rec.last = Date.now(); sr[id] = rec; saveSR(sr);
+    }
+    function inFocus(q, cat){ return cat === "All Grammar" || q.category === cat; }
+    function mistakesForFocus(cat){
+      const sr = loadSR();
+      return BANK.filter(q => inFocus(q, cat) && sr[q.id] && sr[q.id].box === 1 && (sr[q.id].wrong||0) > 0);
+    }
+    function weightedOrder(pool){
+      const sr = loadSR();
+      return pool.map(q => {
+        const w = 6 - boxOf(sr, q.id);      // box1 -> 5 (seen most), box5 -> 1 (seen least)
+        return { q, k: Math.random() / Math.max(1, w) };
+      }).sort((a,b) => a.k - b.k).map(o => o.q);
+    }
+    function updateMistakesInfo(){
+      const n = mistakesForFocus(categorySelect.value).length;
+      els.mistakesInfo.textContent = n
+        ? `🔁 You have ${n} saved mistake${n>1?"s":""} to review in this focus.`
+        : "✓ No saved mistakes here yet — a clean record so far.";
+    }
+
+    /* ---------- session ---------- */
+    let session = {};
+    let orderState = null, matchState = null, wordfillState = null;
+
+    function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+    function bestKey(){ return "engl111MidBest_" + categorySelect.value; }
+    function getBest(){ return Number(store.get(bestKey()) || 0); }
+    function setBest(score){ if(score > getBest()) store.set(bestKey(), String(score)); }
+    function normalize(s){ return String(s).trim().toLowerCase().replace(/[’']/g,"'").replace(/\s+/g," "); }
+    function isCorrect(user, answer){ return normalize(user) === normalize(answer); }
+
+    function start(){
+      const cat = categorySelect.value;
+      const mode = els.mode.value;
+      let pool;
+      if(mode === "review"){
+        pool = mistakesForFocus(cat);
+        if(!pool.length){ alert("No saved mistakes to review in this focus yet. Try a round first!"); return; }
+        pool = shuffle(pool);
+      } else {
+        pool = cat === "All Grammar" ? BANK.slice() : BANK.filter(q => q.category === cat);
+        pool = weightedOrder(pool);
+      }
+      const max = mode === "ten" ? 10 : mode === "twenty" ? 20 : mode === "review" ? pool.length : null;
+      session = {
+        questions:pool, index:0, score:0, streak:0, answered:0, checked:false,
+        max, timer:null, timeLeft: mode==="ten" ? 300 : 0, mode, current:null, missed:[]
+      };
+      els.setup.classList.add("hidden");
+      els.summary.classList.add("hidden");
+      els.game.classList.remove("hidden");
+      els.score.textContent = "0";
+      els.best.textContent = getBest();
+      if(mode === "ten") startTimer();
+      renderQuestion();
+    }
+
+    function startTimer(){
+      clearInterval(session.timer);
+      session.timer = setInterval(()=>{
+        session.timeLeft--;
+        els.timer.textContent = `Time: ${formatTime(session.timeLeft)}`;
+        if(session.timeLeft <= 0) finish("Time is up.");
+      },1000);
+    }
+    function formatTime(sec){ const m=Math.floor(sec/60), s=sec%60; return `${m}:${String(s).padStart(2,"0")}`; }
+
+    function setRing(fraction, num, label){
+      const C = 326.7;
+      els.ringProgress.style.strokeDashoffset = C * (1 - Math.max(0, Math.min(1, fraction)));
+      els.ringNum.textContent = num;
+      els.ringLabel.textContent = label;
+    }
+    function updateStats(){
+      els.streak.textContent = session.streak;
+      els.best.textContent = Math.max(getBest(), session.score);
+      els.count.textContent = session.answered;
+      els.timer.textContent = session.mode === "ten" ? `Time: ${formatTime(session.timeLeft)}` : "";
+      if(session.max){
+        setRing(session.answered / session.max, session.answered, "of " + session.max);
+        els.progressText.textContent = `${session.answered} of ${session.max} answered`;
+      } else {
+        const into = session.streak % 10;
+        setRing(session.streak === 0 ? 0 : (into === 0 ? 1 : into/10), session.streak, "streak");
+        els.progressText.textContent = "Endless practice · reach a streak of 10 for confetti";
+      }
+    }
+
+    /* ---------- rendering ---------- */
+    function renderQuestion(){
+      session.checked = false;
+      orderState = null; matchState = null; wordfillState = null;
+      els.feedback.className = "feedback";
+      els.feedback.style.display = "none";
+      els.nextBtn.classList.add("hidden");
+      els.resetItemBtn.classList.add("hidden");
+      els.submitBtn.classList.remove("hidden");
+      els.answerArea.innerHTML = "";
+
+      if(session.index >= session.questions.length){
+        if(session.mode === "review" || session.max){ finish(); return; }
+        session.questions = shuffle(session.questions);
+        session.index = 0;
+      }
+      session.current = session.questions[session.index++];
+      const q = session.current;
+      els.catBadge.textContent = q.category;
+
+      if(q.type === "order"){ renderOrder(q); }
+      else if(q.type === "match"){ renderMatch(q); }
+      else if(q.type === "wordfill"){ renderWordfill(q); }
+      else { renderMcq(q); }
+
+      updateStats();
+    }
+
+    function renderMcq(q){
+      els.questionText.textContent = q.prompt;
+      const wrap = document.createElement("div");
+      wrap.className = "choices";
+      shuffle(q.choices).forEach(choice=>{
+        const btn = document.createElement("button");
+        btn.className = "choice"; btn.textContent = choice;
+        btn.onclick = () => {
+          [...wrap.children].forEach(b=>{ b.dataset.selected="false"; b.style.borderColor="#ead5dd"; });
+          btn.dataset.selected = "true"; btn.style.borderColor = "var(--garnet)";
+        };
+        wrap.appendChild(btn);
+      });
+      els.answerArea.appendChild(wrap);
+    }
+
+    function renderOrder(q){
+      els.questionText.textContent = q.prompt;
+      els.resetItemBtn.classList.remove("hidden");
+      orderState = { slots:new Array(q.steps.length).fill(null), slotEls:[], poolEl:null };
+      const wrap = document.createElement("div"); wrap.className = "order-wrap";
+
+      const slotBox = document.createElement("div");
+      slotBox.innerHTML = `<div class="section-label">Put the steps in order:</div>`;
+      const slotList = document.createElement("div"); slotList.className = "slot-list";
+      for(let i=0;i<q.steps.length;i++){
+        const slot = document.createElement("div"); slot.className = "order-slot";
+        slot.innerHTML = `<span class="num">${i+1}</span><span class="empty">tap a step below…</span>`;
+        slot.onclick = () => {
+          if(session.checked) return;
+          const val = orderState.slots[i];
+          if(val){ orderState.slots[i] = null; renderOrderState(q); }
+        };
+        orderState.slotEls.push(slot);
+        slotList.appendChild(slot);
+      }
+      slotBox.appendChild(slotList);
+
+      const poolBox = document.createElement("div");
+      poolBox.innerHTML = `<div class="section-label">Steps:</div>`;
+      const poolList = document.createElement("div"); poolList.className = "pool-list";
+      orderState.poolEl = poolList;
+      poolBox.appendChild(poolList);
+
+      wrap.appendChild(slotBox); wrap.appendChild(poolBox);
+      els.answerArea.appendChild(wrap);
+      renderOrderState(q);
+    }
+    function renderOrderState(q){
+      // slots
+      orderState.slots.forEach((val, i)=>{
+        const slot = orderState.slotEls[i];
+        slot.className = "order-slot";
+        slot.innerHTML = `<span class="num">${i+1}</span>` +
+          (val ? `<span class="filled">${val}</span>` : `<span class="empty">tap a step below…</span>`);
+        slot.onclick = () => { if(session.checked) return; if(orderState.slots[i]){ orderState.slots[i]=null; renderOrderState(q); } };
+      });
+      // pool = steps not placed
+      const placed = new Set(orderState.slots.filter(Boolean));
+      orderState.poolEl.innerHTML = "";
+      shuffle(q.steps.filter(s=>!placed.has(s))).forEach(step=>{
+        const b = document.createElement("button"); b.className = "pool-item"; b.textContent = step;
+        b.onclick = () => {
+          if(session.checked) return;
+          const empty = orderState.slots.indexOf(null);
+          if(empty === -1) return;
+          orderState.slots[empty] = step; renderOrderState(q);
+        };
+        orderState.poolEl.appendChild(b);
+      });
+    }
+
+    function renderMatch(q){
+      els.questionText.textContent = q.prompt;
+      els.resetItemBtn.classList.remove("hidden");
+      matchState = { chosen:{}, selLeft:null, leftEls:[], rightEls:[], rightUsed:{} };
+      const lefts = q.pairs.map((p,i)=>({ text:p[0], i }));
+      const rights = shuffle(q.pairs.map(p=>p[1]));
+
+      const wrap = document.createElement("div"); wrap.className = "match-wrap";
+      const leftCol = document.createElement("div"); leftCol.className = "match-col";
+      const rightCol = document.createElement("div"); rightCol.className = "match-col";
+
+      lefts.forEach(L=>{
+        const el = document.createElement("div"); el.className = "match-item match-left"; el.textContent = L.text;
+        el.dataset.i = L.i;
+        el.onclick = () => {
+          if(session.checked || matchState.chosen[L.i] !== undefined) return;
+          matchState.selLeft = L.i;
+          matchState.leftEls.forEach(e=>e.classList.remove("sel"));
+          el.classList.add("sel");
+        };
+        matchState.leftEls.push(el); leftCol.appendChild(el);
+      });
+      rights.forEach(prep=>{
+        const el = document.createElement("div"); el.className = "match-item"; el.textContent = prep; el.dataset.prep = prep;
+        el.onclick = () => {
+          if(session.checked || matchState.rightUsed[prep]) return;
+          if(matchState.selLeft === null) return;
+          const li = matchState.selLeft;
+          matchState.chosen[li] = prep; matchState.rightUsed[prep] = li;
+          const n = Object.keys(matchState.chosen).length;
+          const leftEl = matchState.leftEls.find(e=>Number(e.dataset.i) === li);
+          leftEl.classList.remove("sel"); leftEl.classList.add("done");
+          leftEl.insertAdjacentHTML("beforeend", `<span class="tag">${n}</span>`);
+          el.classList.add("done");
+          el.innerHTML = `${prep}<span class="tag">${n}</span>`;
+          matchState.selLeft = null;
+        };
+        matchState.rightEls.push(el); rightCol.appendChild(el);
+      });
+      wrap.appendChild(leftCol); wrap.appendChild(rightCol);
+      els.answerArea.appendChild(wrap);
+    }
+
+    function renderWordfill(q){
+      els.questionText.textContent = q.prompt;
+      els.resetItemBtn.classList.remove("hidden");
+      wordfillState = { selections:new Array(q.blanks.length).fill(null), blankEls:[], chipEls:[] };
+      const wrap = document.createElement("div"); wrap.className = "wordfill-wrap";
+      q.blanks.forEach((b, i)=>{
+        const item = document.createElement("div"); item.className = "wf-item";
+        const sent = document.createElement("div"); sent.className = "wf-sentence";
+        const parts = b.sentence.split("___");
+        sent.append(document.createTextNode(parts[0] || ""));
+        const blank = document.createElement("span"); blank.className = "wf-blank"; blank.textContent = "?";
+        sent.append(blank);
+        sent.append(document.createTextNode(parts[1] || ""));
+        const choices = document.createElement("div"); choices.className = "wf-choices";
+        const chips = [];
+        shuffle(b.choices).forEach(word=>{
+          const chip = document.createElement("button"); chip.className = "wf-chip"; chip.textContent = word;
+          chip.onclick = () => {
+            if(session.checked) return;
+            wordfillState.selections[i] = word; blank.textContent = word;
+            chips.forEach(c=>c.classList.remove("sel")); chip.classList.add("sel");
+          };
+          chips.push(chip); choices.appendChild(chip);
+        });
+        wordfillState.blankEls.push(blank); wordfillState.chipEls.push(chips);
+        item.appendChild(sent); item.appendChild(choices); wrap.appendChild(item);
+      });
+      els.answerArea.appendChild(wrap);
+    }
+    function markWordfill(q){
+      q.blanks.forEach((b, i)=>{
+        wordfillState.chipEls[i].forEach(chip=>{
+          chip.disabled = true;
+          if(chip.textContent === b.answer) chip.classList.add("correct");
+          else if(chip.textContent === wordfillState.selections[i]) chip.classList.add("wrong");
+        });
+      });
+    }
+
+    function resetCurrentItem(){
+      if(session.checked) return;
+      const q = session.current;
+      if(q.type === "order"){ orderState.slots = new Array(q.steps.length).fill(null); renderOrderState(q); }
+      else if(q.type === "match"){ renderMatch(q); }
+      else if(q.type === "wordfill"){ renderWordfill(q); }
+    }
+
+    /* ---------- checking ---------- */
+    function evaluateCurrent(){
+      const q = session.current;
+      if(q.type === "order"){
+        if(orderState.slots.includes(null)) return { empty:true };
+        return { ok: orderState.slots.every((s,i)=>s === q.steps[i]) };
+      }
+      if(q.type === "match"){
+        if(Object.keys(matchState.chosen).length < q.pairs.length) return { empty:true };
+        return { ok: q.pairs.every((p,i)=> matchState.chosen[i] === p[1]) };
+      }
+      if(q.type === "wordfill"){
+        if(wordfillState.selections.includes(null)) return { empty:true };
+        return { ok: q.blanks.every((b,i)=> wordfillState.selections[i] === b.answer) };
+      }
+      const sel = [...document.querySelectorAll(".choice")].find(b=>b.dataset.selected === "true");
+      if(!sel) return { empty:true };
+      return { ok: isCorrect(sel.textContent, q.answer), user:sel.textContent };
+    }
+
+    function markOrder(q){
+      orderState.slots.forEach((s,i)=>{
+        orderState.slotEls[i].classList.remove("correct","wrong");
+        orderState.slotEls[i].classList.add(s === q.steps[i] ? "correct" : "wrong");
+      });
+    }
+    function markMatch(q){
+      q.pairs.forEach((p,i)=>{
+        const ok = matchState.chosen[i] === p[1];
+        const leftEl = matchState.leftEls.find(e=>Number(e.dataset.i) === i);
+        if(leftEl) leftEl.classList.add(ok ? "correct" : "wrong");
+        const chosenPrep = matchState.chosen[i];
+        const rightEl = matchState.rightEls.find(e=>e.dataset.prep === chosenPrep && !e.dataset.marked);
+        if(rightEl){ rightEl.dataset.marked = "1"; rightEl.classList.add(ok ? "correct" : "wrong"); }
+      });
+    }
+
+    function checkAnswer(){
+      if(session.checked) return;
+      const q = session.current;
+      const res = evaluateCurrent();
+      if(res.empty){
+        els.feedback.className = "feedback wrong";
+        els.feedback.style.display = "block";
+        els.feedback.textContent = q.type === "mcq" ? "Choose an answer first." :
+          q.type === "order" ? "Fill every step first." :
+          q.type === "wordfill" ? "Choose a word for every step first." : "Match every item first.";
+        return;
+      }
+      session.checked = true;
+      session.answered++;
+      recordResult(q.id, res.ok);
+      const prevScore = session.score;
+
+      if(res.ok){
+        session.score++; session.streak++;
+        const milestone = session.streak > 0 && session.streak % 10 === 0;
+        els.feedback.className = "feedback correct";
+        els.feedback.innerHTML = `<div class="praise">${randomPraise()}</div>`;
+        if(milestone){ sfx("win"); buzz([15,40,15,40,60]); launchConfetti(); }
+        else { sfx("correct"); buzz(25); }
+        animateNumber(els.score, prevScore, session.score);
+      } else {
+        session.streak = 0;
+        session.missed.push(q);
+        els.feedback.className = "feedback wrong";
+        els.feedback.innerHTML = `Not quite. <strong>Answer:</strong> ${q.answer}<div class="arabic">${q.explanation}</div>`;
+        sfx("wrong"); buzz([30,40,30]);
+      }
+      if(q.type === "order") markOrder(q);
+      if(q.type === "match") markMatch(q);
+      if(q.type === "wordfill") markWordfill(q);
+
+      setBest(session.score);
+      updateStats();
+
+      els.submitBtn.classList.add("hidden");
+      els.resetItemBtn.classList.add("hidden");
+      const last = session.max && session.answered >= session.max;
+      els.nextBtn.textContent = last ? "See Summary" : "Next";
+      els.nextBtn.classList.remove("hidden");
+      els.nextBtn.onclick = last ? () => finish() : renderQuestion;
+    }
+
+    function finish(reason=""){
+      clearInterval(session.timer);
+      setBest(session.score);
+      els.game.classList.add("hidden");
+      els.summary.classList.remove("hidden");
+      const total = session.answered || 0;
+      const percent = total ? Math.round((session.score/total)*100) : 0;
+      const perfect = total > 0 && session.score === total;
+      els.summaryText.innerHTML =
+        `${reason ? reason + "<br>" : ""}<strong>Score:</strong> ${session.score}/${total} (${percent}%). ` +
+        `<strong>Best for this focus:</strong> ${getBest()}.` +
+        (perfect ? `<br><strong>Perfect round! 🎉</strong>` : "");
+
+      if(perfect){ sfx("win"); launchConfetti(); }
+
+      if(session.missed.length){
+        const unique = [];
+        const seen = new Set();
+        session.missed.slice().reverse().forEach(q=>{ if(!seen.has(q.id)){ seen.add(q.id); unique.push(q); } });
+        els.missedBox.innerHTML = `<h3>Review these:</h3><ul class="review-list">${
+          unique.slice(0,6).map(q=>`<li>${q.prompt}<br><strong>Answer:</strong> ${q.answer}</li>`).join("")
+        }</ul>`;
+      } else {
+        els.missedBox.innerHTML = `<p>Great work. No missed questions in this round.</p>`;
+      }
+    }
+
+    /* ---------- bindings ---------- */
+    els.startBtn.onclick = start;
+    els.submitBtn.onclick = checkAnswer;
+    els.resetItemBtn.onclick = resetCurrentItem;
+    els.stopBtn.onclick = () => finish("Practice stopped.");
+    els.againBtn.onclick = start;
+    els.homeBtn.onclick = () => {
+      clearInterval(session.timer);
+      els.summary.classList.add("hidden");
+      els.game.classList.add("hidden");
+      els.setup.classList.remove("hidden");
+      updateMistakesInfo();
+    };
+    els.soundBtn.onclick = () => {
+      soundOn = !soundOn;
+      store.set("engl111MidSound", soundOn ? "on" : "off");
+      refreshSoundBtn();
+      if(soundOn) sfx("correct");
+    };
+    els.resetBestBtn.onclick = () => {
+      store.remove(bestKey());
+      alert("Best score reset for this grammar focus.");
+    };
+    els.resetProgressBtn.onclick = () => {
+      const cat = categorySelect.value;
+      if(!confirm(`Clear saved progress and mistakes for "${cat}"?`)) return;
+      const sr = loadSR();
+      BANK.forEach(q=>{ if(inFocus(q, cat)) delete sr[q.id]; });
+      saveSR(sr);
+      updateMistakesInfo();
+    };
+    categorySelect.onchange = updateMistakesInfo;
+    document.addEventListener("keydown", e=>{
+      if(els.game.classList.contains("hidden")) return;
+      if(e.key === "Enter"){
+        if(!els.nextBtn.classList.contains("hidden")) els.nextBtn.click();
+        else els.submitBtn.click();
+      }
+    });
+
+    updateMistakesInfo();
+  </script>
+</body>
+</html>
