@@ -73,11 +73,17 @@
     .choices{display:grid;gap:10px;}
     .choice{width:100%;text-align:left;background:#faf7f8;color:var(--ink);border:2px solid #ead5dd;font-weight:700;}
     .choice:hover{border-color:var(--garnet);}
+    .choice.sel{border-color:var(--garnet);background:#fdeef3;}
+    .choice.correct{border-color:var(--correct);background:#e7f5ef;color:#064b32;}
+    .choice.wrong{border-color:var(--wrong);background:#fff0ee;color:#6e160f;}
+    .choice:disabled{opacity:1;cursor:default;}
+    .fb-mark{font-weight:900;font-size:1.15rem;}
+    .fb-line{margin-bottom:2px;}
     .feedback{margin-top:14px;padding:13px;border-radius:16px;display:none;line-height:1.45;}
     .feedback.correct{display:block;background:#e7f5ef;color:#064b32;border:1px solid #b7e2d1;}
     .feedback.wrong{display:block;background:#fff0ee;color:#6e160f;border:1px solid #f1b7b2;}
     .praise{font-size:1.05rem;font-weight:800;}
-    .arabic{direction:rtl;text-align:right;font-family:"Tahoma","Arial",sans-serif;margin-top:6px;font-weight:700;}
+    .arabic{direction:rtl;text-align:right;font-family:"Tahoma","Arial",sans-serif;margin-top:6px;font-weight:700;font-size:1.05rem;line-height:1.6;}
     .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
     .hidden{display:none!important}
     .small{color:var(--muted);font-size:.9rem;line-height:1.4;}
@@ -161,7 +167,6 @@
         <button id="resetBestBtn" class="ghost">Reset Best Score</button>
         <button id="resetProgressBtn" class="ghost">Reset Progress</button>
       </div>
-      <p class="small">Wrong answers show a short Arabic explanation. Correct answers keep moving quickly. Missed questions come back more often until you master them.</p>
       <p id="mistakesInfo" class="small"></p>
     </section>
 
@@ -257,15 +262,32 @@
     refreshSoundBtn();
 
     let audioCtx = null;
+    function ensureCtx(){
+      if(!audioCtx){
+        try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
+      }
+      if(audioCtx && audioCtx.state === "suspended"){ try{ audioCtx.resume(); }catch(e){} }
+      return audioCtx;
+    }
+    // iOS/Chrome-mobile need the audio context unlocked inside a user gesture (tap)
+    function unlockAudio(){
+      const ctx = ensureCtx();
+      if(!ctx) return;
+      try{
+        const b = ctx.createBuffer(1, 1, 22050);
+        const src = ctx.createBufferSource();
+        src.buffer = b; src.connect(ctx.destination); src.start(0);
+      }catch(e){}
+    }
     function sfx(kind){
       if(!soundOn) return;
+      const ctx = ensureCtx();
+      if(!ctx) return;
       try{
-        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-        if(audioCtx.state === "suspended") audioCtx.resume();
-        const now = audioCtx.currentTime;
+        const now = ctx.currentTime + 0.03;
         const beep = (freqA, freqB, type, t0, dur, vol) => {
-          const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-          o.connect(g); g.connect(audioCtx.destination);
+          const o = ctx.createOscillator(), g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
           o.type = type; o.frequency.setValueAtTime(freqA, t0);
           if(freqB) o.frequency.exponentialRampToValueAtTime(freqB, t0 + dur);
           g.gain.setValueAtTime(0.0001, t0);
@@ -273,12 +295,13 @@
           g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
           o.start(t0); o.stop(t0 + dur + 0.02);
         };
-        if(kind === "correct"){ beep(660, 990, "sine", now, 0.18, 0.22); }
-        else if(kind === "wrong"){ beep(220, 120, "triangle", now, 0.28, 0.18); }
-        else if(kind === "win"){ [523,659,784,1047].forEach((f,i)=>beep(f, null, "sine", now + i*0.09, 0.2, 0.2)); }
+        if(kind === "correct"){ beep(660, 990, "sine", now, 0.18, 0.32); }
+        else if(kind === "wrong"){ beep(240, 120, "triangle", now, 0.30, 0.28); }
+        else if(kind === "win"){ [523,659,784,1047].forEach((f,i)=>beep(f, null, "sine", now + i*0.09, 0.2, 0.3)); }
       }catch(e){}
     }
     function buzz(pattern){ if(soundOn && navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} } }
+
 
     const cctx = els.confetti.getContext("2d");
     let confettiRAF = null;
@@ -412,11 +435,11 @@
       els.timer.textContent = session.mode === "ten" ? `Time: ${formatTime(session.timeLeft)}` : "";
       if(session.max){
         setRing(session.answered / session.max, session.answered, "of " + session.max);
-        els.progressText.textContent = `${session.answered} of ${session.max} answered`;
+        els.progressText.textContent = `${session.answered} of ${session.max}`;
       } else {
         const into = session.streak % 10;
         setRing(session.streak === 0 ? 0 : (into === 0 ? 1 : into/10), session.streak, "streak");
-        els.progressText.textContent = "Endless practice · reach a streak of 10 for confetti";
+        els.progressText.textContent = "";
       }
     }
 
@@ -456,8 +479,9 @@
         const btn = document.createElement("button");
         btn.className = "choice"; btn.textContent = choice;
         btn.onclick = () => {
-          [...wrap.children].forEach(b=>{ b.dataset.selected="false"; b.style.borderColor="#ead5dd"; });
-          btn.dataset.selected = "true"; btn.style.borderColor = "var(--garnet)";
+          if(session.checked) return;
+          [...wrap.children].forEach(b=>{ b.dataset.selected="false"; b.classList.remove("sel"); });
+          btn.dataset.selected = "true"; btn.classList.add("sel");
         };
         wrap.appendChild(btn);
       });
@@ -594,10 +618,11 @@
     }
     function markWordfill(q){
       q.blanks.forEach((b, i)=>{
+        const chosen = wordfillState.selections[i];
+        const right = chosen === b.answer;
         wordfillState.chipEls[i].forEach(chip=>{
           chip.disabled = true;
-          if(chip.textContent === b.answer) chip.classList.add("correct");
-          else if(chip.textContent === wordfillState.selections[i]) chip.classList.add("wrong");
+          if(chip.textContent === chosen) chip.classList.add(right ? "correct" : "wrong");
         });
       });
     }
@@ -668,7 +693,7 @@
         session.score++; session.streak++;
         const milestone = session.streak > 0 && session.streak % 10 === 0;
         els.feedback.className = "feedback correct";
-        els.feedback.innerHTML = `<div class="praise">${randomPraise()}</div>`;
+        els.feedback.innerHTML = `<div class="praise"><span class="fb-mark">✓</span> ${randomPraise()}</div>`;
         if(milestone){ sfx("win"); buzz([15,40,15,40,60]); launchConfetti(); }
         else { sfx("correct"); buzz(25); }
         animateNumber(els.score, prevScore, session.score);
@@ -676,8 +701,13 @@
         session.streak = 0;
         session.missed.push(q);
         els.feedback.className = "feedback wrong";
-        els.feedback.innerHTML = `Not quite. <strong>Answer:</strong> ${q.answer}<div class="arabic">${q.explanation}</div>`;
+        els.feedback.innerHTML = `<div class="fb-line"><span class="fb-mark">✗</span></div><div class="arabic">${q.explanation}</div>`;
         sfx("wrong"); buzz([30,40,30]);
+      }
+      if(q.type === "mcq"){
+        const sel = [...document.querySelectorAll(".choice")].find(b=>b.dataset.selected === "true");
+        if(sel){ sel.classList.remove("sel"); sel.classList.add(res.ok ? "correct" : "wrong"); }
+        [...document.querySelectorAll(".choice")].forEach(b=>b.disabled = true);
       }
       if(q.type === "order") markOrder(q);
       if(q.type === "match") markMatch(q);
@@ -714,7 +744,7 @@
         const seen = new Set();
         session.missed.slice().reverse().forEach(q=>{ if(!seen.has(q.id)){ seen.add(q.id); unique.push(q); } });
         els.missedBox.innerHTML = `<h3>Review these:</h3><ul class="review-list">${
-          unique.slice(0,6).map(q=>`<li>${q.prompt}<br><strong>Answer:</strong> ${q.answer}</li>`).join("")
+          unique.slice(0,6).map(q=>`<li>${q.prompt}</li>`).join("")
         }</ul>`;
       } else {
         els.missedBox.innerHTML = `<p>Great work. No missed questions in this round.</p>`;
@@ -722,8 +752,8 @@
     }
 
     /* ---------- bindings ---------- */
-    els.startBtn.onclick = start;
-    els.submitBtn.onclick = checkAnswer;
+    els.startBtn.onclick = () => { unlockAudio(); start(); };
+    els.submitBtn.onclick = () => { ensureCtx(); checkAnswer(); };
     els.resetItemBtn.onclick = resetCurrentItem;
     els.stopBtn.onclick = () => finish("Practice stopped.");
     els.againBtn.onclick = start;
@@ -738,7 +768,7 @@
       soundOn = !soundOn;
       store.set("engl111MidSound", soundOn ? "on" : "off");
       refreshSoundBtn();
-      if(soundOn) sfx("correct");
+      if(soundOn){ unlockAudio(); sfx("correct"); }
     };
     els.resetBestBtn.onclick = () => {
       store.remove(bestKey());
